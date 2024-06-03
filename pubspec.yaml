@@ -9,6 +9,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   get: 4.6.6
   smooth_page_indicator: 1.1.0
+  percent_indicator: 4.2.3
+  data_table_2: 2.5.12
   flutter: 
     sdk: flutter
 

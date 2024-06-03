@@ -1,4 +1,5 @@
 import 'package:attendance_app/app/modules/onboarding/views/intro_page_view.dart';
+import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -23,7 +24,7 @@ class OnboardingView extends GetView<OnboardingController> {
               ),
               onPressed: () {
                 if (controller.onLastPage.value) {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Get.offAllNamed(Routes.LOGIN);
                 } else {
                   controller.pgController.nextPage(
                     duration: Duration(milliseconds: 500),
@@ -35,6 +36,10 @@ class OnboardingView extends GetView<OnboardingController> {
                     controller.onLastPage.value
                         ? "Login Sekarang"
                         : "Berikutnya",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   )),
             ),
           ),
