@@ -1,5 +1,7 @@
+import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   var currentIndex = 0.obs;
@@ -29,6 +31,12 @@ class HomeController extends GetxController {
       currentTime(DateTime.now());
       updateCurrentTime();
     });
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isLoggedIn');
+    Get.offAllNamed(Routes.LOGIN);
   }
 
   String getDayName(int weekday) {

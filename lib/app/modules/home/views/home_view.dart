@@ -112,7 +112,6 @@ class HomePage extends StatelessWidget {
               SizedBox(
                 height: 20,
               ),
-
               //Scan
               InkWell(
                 child: Container(

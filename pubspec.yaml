@@ -11,6 +11,8 @@ dependencies:
   smooth_page_indicator: 1.1.0
   percent_indicator: 4.2.3
   data_table_2: 2.5.12
+  http: ^1.1.0
+  shared_preferences: 2.2.3
   flutter: 
     sdk: flutter
 

@@ -1,8 +1,11 @@
+import 'package:attendance_app/app/modules/home/controllers/home_controller.dart';
 import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UserPage extends StatelessWidget {
+  final HomeController controller = Get.put(HomeController());
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -144,9 +147,7 @@ class UserPage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(40),
               child: ElevatedButton(
-                onPressed: () {
-                  Get.offAllNamed(Routes.HOME);
-                },
+                onPressed: () => controller.logout(),
                 child: Text('Keluar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
