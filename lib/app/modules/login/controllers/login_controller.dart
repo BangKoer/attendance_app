@@ -17,7 +17,7 @@ class LoginController extends GetxController {
       isLoading.value = true;
       var response = await http.post(
         Uri.parse(
-            'http://10.0.2.2:8000/api/auth/login'), // Ganti dengan URL API Anda
+            'http://192.168.1.4:8000/api/auth/login'), // Ganti dengan URL API Anda
         body: {
           'email': emailController.text,
           'password': passController.text,
@@ -28,10 +28,12 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        // Simpan token atau data user jika diperlukan
-
-        // Simpan status login
         final prefs = await SharedPreferences.getInstance();
+        // Simpan token atau data user jika diperlukan
+        await prefs.setString('token', data['data']['token']);
+        await prefs.setString('name', data['data']['user']['name']);
+        await prefs.setString('email', data['data']['user']['email']);
+        // Simpan status login
         await prefs.setBool('isLoggedIn', true);
         print(data);
 

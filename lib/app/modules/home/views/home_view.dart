@@ -1,5 +1,6 @@
 import 'package:attendance_app/app/modules/home/components/customschedule.dart';
 import 'package:attendance_app/app/modules/home/views/history_page.dart';
+import 'package:attendance_app/app/modules/home/views/qr_scan_page.dart';
 import 'package:attendance_app/app/modules/home/views/user_page.dart';
 import 'package:flutter/material.dart';
 
@@ -74,17 +75,17 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Name
-              Text(
-                'Calvin Widi Pratama',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
+              Obx(() => Text(
+                    controller.name.value,
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  )),
               // Role / Job
               Text(
-                'UI / UX Designer',
+                controller.email.value,
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -113,90 +114,113 @@ class HomePage extends StatelessWidget {
                 height: 20,
               ),
               //Scan
-              InkWell(
-                child: Container(
-                  height: 240,
-                  width: 230,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  alignment: Alignment.center,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 10,
+              Obx(() => InkWell(
+                    onTap: controller.isScanEnabled.value
+                        ? () {
+                            Get.to(() => QRScanPage());
+                          }
+                        : null,
+                    // : null,
+                    //     () {
+                    //   Get.to(() => QRScanPage());
+                    // },
+                    child: Container(
+                      height: 240,
+                      width: 230,
+                      decoration: BoxDecoration(
+                        color: controller.isScanEnabled.value
+                            ? Colors.blue
+                            : Colors.grey,
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      Image.asset(
-                        'assets/checkin.png',
-                        scale: 3.8,
+                      alignment: Alignment.center,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Image.asset(
+                            !controller.isCheckedIn.value &&
+                                    !controller.isCheckedOut.value
+                                ? 'assets/checkin.png'
+                                : 'assets/checkout.png',
+                            scale: 3.8,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            !controller.isCheckedIn.value &&
+                                    !controller.isCheckedOut.value
+                                ? "Check-in"
+                                : "Check-Out",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 23,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "Check-in",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 23,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  )),
               SizedBox(
                 height: 20,
               ),
               // Keterangan
-              Container(
-                padding: EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 255, 238, 188),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  'Kamu Belum Check-in Hari ini !',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.amber[700],
-                  ),
-                ),
-              ),
+              Obx(() => Container(
+                    padding: EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: controller.isCheckedIn.value
+                          ? Colors.green
+                          : Color.fromARGB(255, 255, 238, 188),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      controller.isCheckedIn.value
+                          ? 'Kamu sudah check-in hari ini !'
+                          : 'Kamu Belum Check-in Hari ini !',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: controller.isCheckedIn.value
+                            ? Colors.white
+                            : Colors.amber[700],
+                      ),
+                    ),
+                  )),
               SizedBox(
                 height: 20,
               ),
 
               // jadwal
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 25, horizontal: 25),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 1.5),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Start
-                    CustomSchedule(
-                      icon: Icons.access_time,
-                      time: '08.30 - 09.30',
-                      info: 'Check-In',
+              Obx(() => Container(
+                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 25),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue, width: 1.5),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Image.asset('assets/Line.png'),
-                    // End
-                    CustomSchedule(
-                      icon: Icons.access_time,
-                      time: '20.30 - 21.30',
-                      info: 'Check-out',
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Start
+                        CustomSchedule(
+                          icon: Icons.access_time,
+                          time: controller.checkInTime.value,
+                          info: 'Check-In',
+                        ),
+                        Image.asset('assets/Line.png'),
+                        // End
+                        CustomSchedule(
+                          icon: Icons.access_time,
+                          time: controller.checkOutTime.value,
+                          info: 'Check-out',
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
+                  )),
             ],
           ),
         ),

@@ -42,14 +42,14 @@ class UserPage extends StatelessWidget {
               height: 24,
             ),
             // Name
-            Text(
-              'Calvin Widi Pratama',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            Obx(() => Text(
+                  controller.name.value,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                )),
             SizedBox(
               height: 12,
             ),
@@ -127,14 +127,14 @@ class UserPage extends StatelessWidget {
                           color: Colors.black54,
                         ),
                       ),
-                      Text(
-                        "calvinwidi@gmail.com",
-                        style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Obx(() => Text(
+                            controller.email.value,
+                            style: TextStyle(
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          )),
                     ],
                   ),
                 ],
