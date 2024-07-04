@@ -17,7 +17,7 @@ class LoginController extends GetxController {
       isLoading.value = true;
       var response = await http.post(
         Uri.parse(
-            'http://192.168.1.4:8000/api/auth/login'), // Ganti dengan URL API Anda
+            'http://192.168.238.100:8000/api/auth/login'), // Ganti dengan URL API Anda
         body: {
           'email': emailController.text,
           'password': passController.text,

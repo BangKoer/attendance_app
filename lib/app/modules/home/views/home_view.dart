@@ -115,7 +115,8 @@ class HomePage extends StatelessWidget {
               ),
               //Scan
               Obx(() => InkWell(
-                    onTap: controller.isScanEnabled.value
+                    onTap: controller.isCheckedIn.value ^
+                            controller.isCheckedOut.value
                         ? () {
                             Get.to(() => QRScanPage());
                           }
@@ -128,7 +129,8 @@ class HomePage extends StatelessWidget {
                       height: 240,
                       width: 230,
                       decoration: BoxDecoration(
-                        color: controller.isScanEnabled.value
+                        color: controller.isCheckedIn.value ^
+                                controller.isCheckedOut.value
                             ? Colors.blue
                             : Colors.grey,
                         borderRadius: BorderRadius.circular(15),
@@ -142,8 +144,7 @@ class HomePage extends StatelessWidget {
                             height: 10,
                           ),
                           Image.asset(
-                            !controller.isCheckedIn.value &&
-                                    !controller.isCheckedOut.value
+                            controller.isCheckedIn.value
                                 ? 'assets/checkin.png'
                                 : 'assets/checkout.png',
                             scale: 3.8,
@@ -152,8 +153,7 @@ class HomePage extends StatelessWidget {
                             height: 20,
                           ),
                           Text(
-                            !controller.isCheckedIn.value &&
-                                    !controller.isCheckedOut.value
+                            controller.isCheckedIn.value
                                 ? "Check-in"
                                 : "Check-Out",
                             style: TextStyle(
@@ -179,9 +179,12 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      controller.isCheckedIn.value
-                          ? 'Kamu sudah check-in hari ini !'
-                          : 'Kamu Belum Check-in Hari ini !',
+                      controller.isCheckedIn.value &&
+                              controller.isCheckedOut.value
+                          ? 'Kamu sudah Absen hari ini !'
+                          : controller.isCheckedIn.value
+                              ? 'Kamu sudah check-in hari ini !'
+                              : 'Kamu belum check-in hari ini !',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

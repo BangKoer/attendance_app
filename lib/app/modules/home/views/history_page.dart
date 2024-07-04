@@ -1,8 +1,12 @@
+import 'package:attendance_app/app/modules/home/controllers/home_controller.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class HistoryPage extends StatelessWidget {
+  final HomeController controller = Get.find();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -58,18 +62,22 @@ class HistoryPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CircularPercentIndicator(
-                          radius: 70.0,
-                          lineWidth: 15.0,
-                          percent: 0.20,
-                          center: Text(
-                            "20.0%",
-                            style: new TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Colors.blue,
-                        ),
+                        Obx(() {
+                          double percentage =
+                              controller.attendancePercentage.value;
+                          return CircularPercentIndicator(
+                            radius: 70.0,
+                            lineWidth: 15.0,
+                            percent: percentage / 100,
+                            center: Text(
+                              "${percentage.toStringAsFixed(1)}%",
+                              style: new TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),
+                            ),
+                            circularStrokeCap: CircularStrokeCap.round,
+                            progressColor: Colors.blue,
+                          );
+                        }),
                         SizedBox(
                           width: 20,
                         ),
@@ -79,7 +87,7 @@ class HistoryPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Calvin Widi Pratama',
+                                controller.name.value,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,
@@ -91,7 +99,7 @@ class HistoryPage extends StatelessWidget {
                               ),
                               // Role / Job
                               Text(
-                                'UI / UX Designer',
+                                controller.email.value,
                                 style: TextStyle(
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.bold,
@@ -101,21 +109,24 @@ class HistoryPage extends StatelessWidget {
                               SizedBox(
                                 height: 5,
                               ),
-                              AttendanceDetail(
-                                info: 'Attendance',
-                                score: '80',
-                                warna: Colors.black,
-                              ),
-                              AttendanceDetail(
-                                info: 'Presents',
-                                score: '10',
-                                warna: Colors.green,
-                              ),
-                              AttendanceDetail(
-                                info: 'Absence',
-                                score: '70',
-                                warna: Colors.red,
-                              ),
+                              Obx(() => AttendanceDetail(
+                                    info: 'Attendance',
+                                    score: controller.attendanceHistory.length
+                                        .toString(),
+                                    warna: Colors.black,
+                                  )),
+                              Obx(() => AttendanceDetail(
+                                    info: 'Presents',
+                                    score: controller.attendancepresent.value
+                                        .toString(),
+                                    warna: Colors.green,
+                                  )),
+                              Obx(() => AttendanceDetail(
+                                    info: 'Absence',
+                                    score: controller.attendanceabsent.value
+                                        .toString(),
+                                    warna: Colors.red,
+                                  )),
                             ],
                           ),
                         )
@@ -158,115 +169,116 @@ class HistoryPage extends StatelessWidget {
             ),
 
             // Table
-            Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    offset: const Offset(
-                      0.5,
-                      0.5,
-                    ),
-                    blurRadius: 10.0,
-                    spreadRadius: 1.0,
-                  ), //BoxShadow
-                  BoxShadow(
-                    color: Colors.white,
-                    offset: const Offset(0.0, 0.0),
-                    blurRadius: 0.0,
-                    spreadRadius: 0.0,
-                  ), //BoxShadow
-                ],
-              ),
-              child: Column(
-                children: [
-                  // TimeLine
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.blue,
-                          weight: 12,
+            Obx(() {
+              if (controller.attendanceHistory.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade300,
+                        offset: const Offset(
+                          0.5,
+                          0.5,
                         ),
-                      ),
-                      Text(
-                        'Tanggal',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.arrow_forward,
-                          color: Colors.blue,
-                          weight: 12,
-                        ),
-                      ),
+                        blurRadius: 10.0,
+                        spreadRadius: 1.0,
+                      ), //BoxShadow
+                      BoxShadow(
+                        color: Colors.white,
+                        offset: const Offset(0.0, 0.0),
+                        blurRadius: 0.0,
+                        spreadRadius: 0.0,
+                      ), //BoxShadow
                     ],
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columnSpacing: MediaQuery.of(context).size.width * 0.08,
-                      // horizontalMargin: 12,
-                      headingRowColor: MaterialStatePropertyAll(
-                          const Color.fromARGB(255, 218, 238, 255)),
-                      columns: [
-                        DataColumn(
-                          label: Text('Date'),
-                        ),
-                        DataColumn(
-                          label: Text('Check In'),
-                        ),
-                        DataColumn(
-                          label: Text('Check Out'),
-                        ),
-                        DataColumn(
-                          label: Text('Working Hr\'s'),
-                        ),
-                      ],
-                      dataRowMinHeight: 40,
-                      dataRowMaxHeight: 80,
+                  child: Column(
+                    children: [
+                      // TimeLine
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.blue,
+                              weight: 12,
+                            ),
+                          ),
+                          Text(
+                            'Tanggal',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_forward,
+                              color: Colors.blue,
+                              weight: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Obx(() {
+                          if (controller.attendanceHistory.isEmpty) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          return DataTable(
+                            columnSpacing:
+                                MediaQuery.of(context).size.width * 0.08,
+                            // horizontalMargin: 12,
+                            headingRowColor: MaterialStatePropertyAll(
+                                const Color.fromARGB(255, 218, 238, 255)),
+                            columns: [
+                              DataColumn(
+                                label: Text('Date'),
+                              ),
+                              DataColumn(
+                                label: Text('Check In'),
+                              ),
+                              DataColumn(
+                                label: Text('Check Out'),
+                              ),
+                              DataColumn(
+                                label: Text('Working Hr\'s'),
+                              ),
+                            ],
+                            dataRowMinHeight: 40,
+                            dataRowMaxHeight: 80,
 
-                      // horizontalMargin: 12,
-                      // dataRowHeight: 60,
-                      rows: [
-                        DataRow(cells: [
-                          DataCell(DayTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(WorksHourTable()),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(DayTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(WorksHourTable()),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(DayTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(WorksHourTable()),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(DayTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(CheckAttandanceTable()),
-                          DataCell(WorksHourTable()),
-                        ]),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+                            // horizontalMargin: 12,
+                            // dataRowHeight: 60,
+                            rows: controller.attendanceHistory.map((history) {
+                              return DataRow(cells: [
+                                DataCell(DayTable(
+                                    dateTimeString: history['created_at'])),
+                                DataCell(CheckAttandanceTable(
+                                    time: history['check_in'] ?? 'N/A',
+                                    isCheckin: true)),
+                                DataCell(CheckAttandanceTable(
+                                    time: history['check_out'] ?? 'N/A',
+                                    isCheckin: false)),
+                                DataCell(WorksHourTable(
+                                    workingHours:
+                                        history['total_time'] ?? 'N/A')),
+                              ]);
+                            }).toList(),
+                          );
+                        }),
+                      )
+                    ],
+                  ),
+                );
+              }
+            }),
           ],
         ),
       ),
@@ -275,8 +287,10 @@ class HistoryPage extends StatelessWidget {
 }
 
 class WorksHourTable extends StatelessWidget {
+  final String workingHours;
   const WorksHourTable({
     super.key,
+    required this.workingHours,
   });
 
   @override
@@ -288,7 +302,7 @@ class WorksHourTable extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: Text(
-        'Absent',
+        workingHours,
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.bold,
@@ -300,24 +314,39 @@ class WorksHourTable extends StatelessWidget {
 }
 
 class CheckAttandanceTable extends StatelessWidget {
+  final String time;
+  final bool isCheckin;
   const CheckAttandanceTable({
     super.key,
+    required this.time,
+    required this.isCheckin,
   });
+
+  String _formatTime(String time) {
+    try {
+      DateTime dateTime = DateTime.parse(time);
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return '--:--';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Icon(
-          Icons.arrow_outward,
-          color: Colors.green,
+          isCheckin
+              ? Icons.arrow_outward
+              : Icons.subdirectory_arrow_right_sharp,
+          color: isCheckin ? Colors.green : Colors.red,
           weight: 20,
         ),
         SizedBox(
           width: 4,
         ),
         Text(
-          '08:50',
+          _formatTime(time),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 15,
@@ -329,9 +358,29 @@ class CheckAttandanceTable extends StatelessWidget {
 }
 
 class DayTable extends StatelessWidget {
+  final String dateTimeString;
   const DayTable({
     super.key,
+    required this.dateTimeString,
   });
+
+  String _formatDate(String dateTimeString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('dd').format(dateTime);
+    } catch (e) {
+      return '--';
+    }
+  }
+
+  String _formatDay(String dateTimeString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('EEE').format(dateTime);
+    } catch (e) {
+      return '--';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -350,13 +399,13 @@ class DayTable extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '18',
+                _formatDate(dateTimeString),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              Text('Mon'),
+              Text(_formatDay(dateTimeString)),
             ],
           )),
     );

@@ -1,3 +1,4 @@
+import 'package:attendance_app/app/model/absensimodel.dart';
 import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,10 @@ class HomeController extends GetxController {
   var qrResult = ''.obs;
   var isCheckedIn = false.obs;
   var isCheckedOut = false.obs;
+  var attendanceHistory = [].obs;
+  var attendancepresent = 0.obs;
+  var attendanceabsent = 0.obs;
+  var attendancePercentage = 0.0.obs;
 
   @override
   void onInit() {
@@ -25,7 +30,7 @@ class HomeController extends GetxController {
     updateCurrentTime();
     loadUserData();
     fetchSchedule();
-    checkIfCheckedIn();
+    fetchAttendanceHistory();
   }
 
   @override
@@ -53,12 +58,55 @@ class HomeController extends GetxController {
     checkIfCheckedIn();
   }
 
+  Future<void> fetchAttendanceHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    final response = await http.get(
+      Uri.parse('http://192.168.238.100:8000/api/absen'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      if (data['status_code'] == 200) {
+        attendanceHistory.value = data['data']['absen'];
+        calculateAttendancePercentage();
+      } else {
+        Get.snackbar('Error', data['message']);
+      }
+    } else {
+      Get.snackbar('Error', 'Failed to fetch attendance history');
+    }
+  }
+
+  void calculateAttendancePercentage() {
+    int totalDays = attendanceHistory.length;
+    if (totalDays == 0) {
+      attendancePercentage.value = 0.0;
+      return;
+    }
+
+    int presentDays = attendanceHistory
+        .where((attendance) =>
+            attendance['check_in'] != null && attendance['check_out'] != null)
+        .length;
+    attendancepresent.value = presentDays;
+    attendanceabsent.value = attendanceHistory
+        .where((attendance) =>
+            attendance['check_in'] == null || attendance['check_out'] == null)
+        .length;
+
+    attendancePercentage.value = (presentDays / totalDays) * 100;
+  }
+
   Future<void> fetchSchedule() async {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token') ?? '';
 
     var response = await http.get(
-      Uri.parse('http://192.168.1.4:8000/api/schedule/absen'),
+      Uri.parse('http://192.168.238.100:8000/api/schedule/absen'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -99,7 +147,7 @@ class HomeController extends GetxController {
     String token = prefs.getString('token') ?? '';
 
     var response = await http.post(
-      Uri.parse('http://192.168.1.4:8000/api/absen/checkin'),
+      Uri.parse('http://192.168.238.100:8000/api/absen/checkin'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -120,6 +168,11 @@ class HomeController extends GetxController {
       // Save check-in status
       // prefs.setBool('isCheckedIn', true);
       prefs.setBool('isCheckedIn_${email.value}', true);
+      isCheckedIn.value == true;
+      DateTime now = DateTime.now();
+      String todayString =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      prefs.setString('lastCheckInDate_${email.value}', todayString);
     } else {
       var dataerr = jsonDecode(response.body);
       Get.snackbar('Error',
@@ -133,7 +186,7 @@ class HomeController extends GetxController {
     String token = prefs.getString('token') ?? '';
 
     var response = await http.post(
-      Uri.parse('http://192.168.1.4:8000/api/absen/checkout'),
+      Uri.parse('http://192.168.238.100:8000/api/absen/checkout'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -151,9 +204,15 @@ class HomeController extends GetxController {
       isCheckedOut.value = true;
       Get.snackbar('Success', 'Check-Out successful.${response.statusCode}');
       print(data2);
-      // Save check-in status
+      // Save check-out status
       // prefs.setBool('isCheckedIn', true);
       prefs.setBool('isCheckedOut_${email.value}', true);
+      isCheckedIn.value == false;
+      isCheckedOut.value == true;
+      DateTime now = DateTime.now();
+      String todayString =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      prefs.setString('lastCheckOutDate_${email.value}', todayString);
     } else {
       var dataerr = jsonDecode(response.body);
       Get.snackbar('Error',
@@ -161,7 +220,7 @@ class HomeController extends GetxController {
     }
   }
 
-  void handleScanResult(String scanData) {
+  Future<void> handleScanResult(String scanData) async {
     final data = jsonDecode(scanData);
     final uniqueId = data['unique_id'];
 
@@ -171,12 +230,16 @@ class HomeController extends GetxController {
     DateTime checkOut = DateTime.parse(
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${checkOutTime.value}');
 
-    if (now.isBefore(checkIn) && !isCheckedIn.value) {
+    if (now.isBefore(checkIn) && isCheckedIn.value == false) {
       print("Check in");
       postQrResult(uniqueId);
-    } else {
+    } else if (isCheckedIn.value == true &&
+        isCheckedOut == false &&
+        now.isAfter(checkOut)) {
       postCheckout(uniqueId);
       print("Check Out");
+    } else {
+      postCheckout(uniqueId);
     }
   }
 
@@ -187,6 +250,20 @@ class HomeController extends GetxController {
     // isCheckedIn.value = prefs.getBool('isCheckedIn') ?? false;
     isCheckedIn.value = prefs.getBool('isCheckedIn_${email.value}') ?? false;
     isCheckedOut.value = prefs.getBool('isCheckedOut_${email.value}') ?? false;
+    DateTime now = DateTime.now();
+    String todayString =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    String? lastCheckInDate = prefs.getString('lastCheckInDate_${email.value}');
+    String? lastCheckOutDate =
+        prefs.getString('lastCheckOutDate_${email.value}');
+    if (lastCheckInDate != todayString) {
+      isCheckedIn.value = false;
+      prefs.setBool('isCheckedIn_${email.value}', false);
+    }
+    if (lastCheckOutDate != todayString) {
+      isCheckedOut.value = false;
+      prefs.setBool('isCheckedOut_${email.value}', false);
+    }
   }
 
   Future<void> logout() async {
