@@ -203,23 +203,23 @@ class HistoryPage extends StatelessWidget {
                             onPressed: () {},
                             icon: Icon(
                               Icons.arrow_back,
-                              color: Colors.blue,
+                              color: Colors.white,
                               weight: 12,
                             ),
                           ),
                           Text(
-                            'Tanggal',
+                            'Recap',
                             style: TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue,
+                              color: Colors.white,
                             ),
                           ),
                           IconButton(
                             onPressed: () {},
                             icon: Icon(
                               Icons.arrow_forward,
-                              color: Colors.blue,
+                              color: Colors.white,
                               weight: 12,
                             ),
                           ),

@@ -173,6 +173,7 @@ class HomeController extends GetxController {
       String todayString =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
       prefs.setString('lastCheckInDate_${email.value}', todayString);
+      calculateAttendancePercentage();
     } else {
       var dataerr = jsonDecode(response.body);
       Get.snackbar('Error',
@@ -213,6 +214,7 @@ class HomeController extends GetxController {
       String todayString =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
       prefs.setString('lastCheckOutDate_${email.value}', todayString);
+      calculateAttendancePercentage();
     } else {
       var dataerr = jsonDecode(response.body);
       Get.snackbar('Error',
@@ -237,9 +239,11 @@ class HomeController extends GetxController {
         isCheckedOut == false &&
         now.isAfter(checkOut)) {
       postCheckout(uniqueId);
+      fetchAttendanceHistory();
       print("Check Out");
     } else {
       postCheckout(uniqueId);
+      fetchAttendanceHistory();
     }
   }
 
