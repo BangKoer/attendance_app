@@ -9,6 +9,7 @@ class LoginController extends GetxController {
   var emailController = TextEditingController();
   var passController = TextEditingController();
   var data;
+  String baseURL = "192.168.231.100";
 
   var isLoading = false.obs;
 
@@ -17,7 +18,7 @@ class LoginController extends GetxController {
       isLoading.value = true;
       var response = await http.post(
         Uri.parse(
-            'http://192.168.238.100:8000/api/auth/login'), // Ganti dengan URL API Anda
+            'http://$baseURL:8000/api/auth/login'), // Ganti dengan URL API Anda
         body: {
           'email': emailController.text,
           'password': passController.text,

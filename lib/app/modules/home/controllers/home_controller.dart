@@ -22,6 +22,7 @@ class HomeController extends GetxController {
   var attendancepresent = 0.obs;
   var attendanceabsent = 0.obs;
   var attendancePercentage = 0.0.obs;
+  String baseURL = "192.168.231.100";
 
   @override
   void onInit() {
@@ -62,7 +63,7 @@ class HomeController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token') ?? '';
     final response = await http.get(
-      Uri.parse('http://192.168.238.100:8000/api/absen'),
+      Uri.parse('http://$baseURL:8000/api/absen'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -106,7 +107,7 @@ class HomeController extends GetxController {
     String token = prefs.getString('token') ?? '';
 
     var response = await http.get(
-      Uri.parse('http://192.168.238.100:8000/api/schedule/absen'),
+      Uri.parse('http://$baseURL:8000/api/schedule/absen'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -147,7 +148,7 @@ class HomeController extends GetxController {
     String token = prefs.getString('token') ?? '';
 
     var response = await http.post(
-      Uri.parse('http://192.168.238.100:8000/api/absen/checkin'),
+      Uri.parse('http://$baseURL:8000/api/absen/checkin'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -168,7 +169,6 @@ class HomeController extends GetxController {
       // Save check-in status
       // prefs.setBool('isCheckedIn', true);
       prefs.setBool('isCheckedIn_${email.value}', true);
-      isCheckedIn.value == true;
       DateTime now = DateTime.now();
       String todayString =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -186,7 +186,7 @@ class HomeController extends GetxController {
     String token = prefs.getString('token') ?? '';
 
     var response = await http.post(
-      Uri.parse('http://192.168.238.100:8000/api/absen/checkout'),
+      Uri.parse('http://$baseURL:8000/api/absen/checkout'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -207,8 +207,8 @@ class HomeController extends GetxController {
       // Save check-out status
       // prefs.setBool('isCheckedIn', true);
       prefs.setBool('isCheckedOut_${email.value}', true);
-      isCheckedIn.value == false;
-      isCheckedOut.value == true;
+      isCheckedIn.value = false;
+      isCheckedOut.value = true;
       DateTime now = DateTime.now();
       String todayString =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';

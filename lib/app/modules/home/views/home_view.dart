@@ -115,8 +115,7 @@ class HomePage extends StatelessWidget {
               ),
               //Scan
               Obx(() => InkWell(
-                    onTap: controller.isCheckedIn.value ^
-                            controller.isCheckedOut.value
+                    onTap: controller.isScanEnabled.value
                         ? () {
                             Get.to(() => QRScanPage());
                           }
@@ -129,8 +128,7 @@ class HomePage extends StatelessWidget {
                       height: 240,
                       width: 230,
                       decoration: BoxDecoration(
-                        color: controller.isCheckedIn.value ^
-                                controller.isCheckedOut.value
+                        color: controller.isScanEnabled.value
                             ? Colors.blue
                             : Colors.grey,
                         borderRadius: BorderRadius.circular(15),
@@ -145,8 +143,8 @@ class HomePage extends StatelessWidget {
                           ),
                           Image.asset(
                             controller.isCheckedIn.value
-                                ? 'assets/checkin.png'
-                                : 'assets/checkout.png',
+                                ? 'assets/checkout.png'
+                                : 'assets/checkin.png',
                             scale: 3.8,
                           ),
                           SizedBox(
@@ -154,8 +152,8 @@ class HomePage extends StatelessWidget {
                           ),
                           Text(
                             controller.isCheckedIn.value
-                                ? "Check-in"
-                                : "Check-Out",
+                                ? "Check-Out"
+                                : "Check-in",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -173,14 +171,14 @@ class HomePage extends StatelessWidget {
               Obx(() => Container(
                     padding: EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: controller.isCheckedIn.value
+                      color: controller.isCheckedIn.value ||
+                              controller.isCheckedOut.value
                           ? Colors.green
                           : Color.fromARGB(255, 255, 238, 188),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      controller.isCheckedIn.value &&
-                              controller.isCheckedOut.value
+                      controller.isCheckedOut.value
                           ? 'Kamu sudah Absen hari ini !'
                           : controller.isCheckedIn.value
                               ? 'Kamu sudah check-in hari ini !'
@@ -188,7 +186,8 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: controller.isCheckedIn.value
+                        color: controller.isCheckedIn.value ||
+                                controller.isCheckedOut.value
                             ? Colors.white
                             : Colors.amber[700],
                       ),
